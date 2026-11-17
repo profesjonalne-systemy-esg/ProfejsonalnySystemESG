@@ -22,7 +22,7 @@ async def health_check():
 @app.get("/api/health/db")
 def health_db():
     try:
-        with psycopg.connect(os.environ["DATABASE_URL"], connect_timeout=3) as conn:
+        with psycopg.connect(os.environ["DATABASE_URL"].replace("+psycopg", ""), connect_timeout=3) as conn:
             row = conn.execute(
                 "SELECT extversion FROM pg_extension WHERE extname = 'vector'"
             ).fetchone()
