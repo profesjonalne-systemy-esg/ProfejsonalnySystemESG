@@ -1,0 +1,10 @@
+# Środowisko wirtualne
+.venv/
+env/
+
+# Pliki cache Pythona
+__pycache__/
+*.pyc
+
+# Zmienne środowiskowe (na przyszłość)
+.env
