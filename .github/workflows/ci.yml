@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: esg_user
+          POSTGRES_PASSWORD: esg_password
+          POSTGRES_DB: esg_database
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U esg_user -d esg_database"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      # ten sam obraz co w docker-compose: Python 3.12, Tesseract, WeasyPrint
+      - name: Obraz backendu
+        run: docker build -t backend backend
+      - name: black, flake8, migracje, testy
+        run: |
+          docker run --rm --network host \
+            -e DATABASE_URL=postgresql+psycopg://esg_user:esg_password@localhost:5432/esg_database \
+            -e JWT_SECRET=tylko-do-testow-w-ci-0123456789abcdef \
+            backend sh -ec "
+              pip install -q --root-user-action=ignore -r requirements-dev.txt
+              black --check .
+              flake8 .
+              alembic upgrade head
+              alembic check
+              python -m pytest -q
+            "
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: ESLint
+        run: npm run lint
+      - name: Build (TypeScript + Vite)
+        run: npm run build
