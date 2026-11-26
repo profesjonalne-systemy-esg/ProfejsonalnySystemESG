@@ -1,54 +1,37 @@
-import { useState } from 'react'
-import './App.css'
-import { Routes, Route, Link } from 'react-router';
-import { HomePage } from './pages/HomePage';
+import { Routes, Route } from 'react-router';
+import { AppShell } from './components/AppShell';
+import { PublicLayout } from './components/PublicLayout';
+import { LoginPage } from './features/auth/LoginPage';
+import { RegisterPage } from './features/auth/RegisterPage';
+import { ProtectedRoute } from './features/auth/routes';
+import { DocumentsPage } from './features/documents/DocumentsPage';
+import { EditorPage } from './features/editor/EditorPage';
+import { KnowledgePage } from './features/knowledge/KnowledgePage';
+import { MetricsPage } from './features/metrics/MetricsPage';
+import { DashboardPage } from './features/projects/DashboardPage';
 import { AboutPage } from './pages/AboutPage';
-import { LoginPage } from './pages/LoginPage';
+import { HomePage } from './pages/HomePage';
 
+/** Wszystkie trasy są już wpisane. Epiki zmieniają tylko swoje strony w src/features. */
 function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
-      {/* Pasek nawigacji */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo zbudowane w samym CSS */}
-          <Link to="/" className="flex items-center gap-2.5 font-bold text-xl text-indigo-600">
-            <span className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-extrabold">
-            </span>
-            <span>Profesjonalne Systemy ESG</span>
-          </Link>
-
-          <nav className="flex items-center gap-6">
-            <Link to="/" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-              Strona główna
-            </Link>
-            <Link to="/o-nas" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-              O projekcie
-            </Link>
-            <Link
-              to="/login"
-              className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-sm"
-            >
-              Zaloguj się
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Główna zawartość */}
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/o-nas" element={<AboutPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </main>
-
-      {/* Stopka */}
-      <footer className="bg-white border-t border-slate-200 py-8 text-center text-sm text-slate-500">
-        © {new Date().getFullYear()} Profesjonalne Systemy ESG
-      </footer>
-    </div>
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/o-nas" element={<AboutPage />} />
+      </Route>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppShell />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/knowledge" element={<KnowledgePage />} />
+          <Route path="/projects/:projectId/documents" element={<DocumentsPage />} />
+          <Route path="/projects/:projectId/metrics" element={<MetricsPage />} />
+          <Route path="/projects/:projectId/report" element={<EditorPage />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 

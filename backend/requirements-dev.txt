@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Lintery i testy
+black==26.10.1
+flake8==7.5.0
+httpx==0.28.1
+pytest==9.2.0
