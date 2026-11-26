@@ -16,18 +16,20 @@ if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL nie zostal ustawiony w pliku .env")
 
 # utworzenie polaczenia z postgresql
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True
-)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 # fabryka sesji
-SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    autocommit=False
-)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
 
 # klasa bazowa dla modeli
 class Base(DeclarativeBase):
     pass
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

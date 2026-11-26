@@ -18,9 +18,18 @@ services:
 
   backend:
     build: ./backend
-    command: sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
+    command: sh -c "alembic upgrade head && python -m app.seed && uvicorn main:app --host 0.0.0.0 --port 8000"
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      UPLOAD_DIR: /data/uploads
+      JWT_SECRET: ${JWT_SECRET:-}
+      # tryb deweloperski: praca bez logowania i dane przykładowe (wyłączyć po US 2.3)
+      AUTH_DEMO: ${AUTH_DEMO:-true}
+      SEED_DEMO: ${SEED_DEMO:-true}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - uploads:/data/uploads
     ports:
       - "8000:8000"
     depends_on:
@@ -43,3 +52,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads:
